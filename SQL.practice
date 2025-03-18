@@ -216,3 +216,70 @@ ORDER BY kawaii DESC;
   予約語(SELECT,WHERE,etc)は大文字
   特定の予約語(SELECT,WHERE,ORDER BY,etc)の後は改行しよう
   SELECTで列名指定,LIMITすると速くなる
+
+## GROUP BY
+
+- データの集計に必須
+- エラーが続出する原因
+- 今後GROUP BYで悩むことがなくなる
+
+### 手作業時代
+
+鬼「今週の日毎の会員登録数よこせ」
+
+**members**
+
+| name     | created_day | channel | age |
+|----------|-------------|---------|-----|
+| 蕪木太郎 | 2025-03-15  | web     | 31  |
+| 蕪木二郎 | 2025-03-15  | ad      | 31  |
+| 蕪木三郎 | 2025-03-17  | ad      | 31  |
+| 蕪木四郎 | 2025-03-17  | ad      | 32  |
+| 蕪木五郎 | 2025-03-18  | web     | 33  |
+
+```sql
+SELECT COUNT(name)
+FROM members
+WHERE created_day = '2025-03-15';
+          ⇩
+       COUNT 2
+COUNTのイメージ:レコード数を数えたい時に使う
+
+鬼「次は昨年の日毎の会員登録数よこせ」
+
+SELECT created_day, COUNT(name)
+  FROM members
+GROUP BY created_day;
+  GROUP BY:同じ値でまとめる
+
+| created_day | count |
+|  2025-03-15  |2|
+|  2025-03-17  |2|
+|  2025-03-18  |1|
+
+GROUP BYのイメージ:複数のデータごとに集計したい時に使う
+
+鬼「置いとけ。次は日毎の会員登録数をチャンネルごとに出せ」
+
+SELECT created_day, channel, COUNT(name)
+ FROM members
+ GROUP BY created_day;
+
+ ！！これはエラーになる！！
+
+| created_day | channel |
+|  2025-03-15  |   ?   |//どの値を入れればいいか分からない
+|  2025-03-17  |  ad   |
+|  2025-03-18  |  web  |
+
+SELECT created_day, channel, COUNT(name)
+ FROM members
+ GROUP BY created_day,channel;
+
+| created_day | channel |count|
+|  2025-03-15  |  web   |1|
+|  2025-03-15  |  ad    |1|
+|  2025-03-17  |  ad    |2|
+|  2025-03-18  |  web   |1|
+軸になるカラムを全てORDER BYで指定。
+なんの値が入るかをSQLが特定できるようにする
