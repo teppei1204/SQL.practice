@@ -281,5 +281,6 @@ SELECT created_day, channel, COUNT(name)
 |  2025-03-15  |  ad    |1|
 |  2025-03-17  |  ad    |2|
 |  2025-03-18  |  web   |1|
-軸になるカラムを全てORDER BYで指定。
+軸になるカラムを全てGROUP BYで指定。
 なんの値が入るかをSQLが特定できるようにする
+
