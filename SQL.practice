@@ -21,3 +21,198 @@
 - テーブルの**作成**、**更新**、**削除**
 - アプリ開発時にデータベースを**操作**できる
 - データ分析して**ビジネス活動を改善**
+
+## SELECT FROM
+
+- **表**のことを**テーブル**
+- **行**のことを**カラム**
+- **列**のことを**レコード**
+
+### Q. 名前と特徴の取得
+
+**one piece**
+
+| name   | fruit   | feature |
+|--------|---------|---------|
+| ルフィ | ヒトヒト | 自由    |
+| ゾロ   | 無し    | 方向音痴 |
+| ブルック | ヨミヨミ | 骨     |
+| サンジ | 無し    | ぐる眉  |
+
+```sql
+SELECT name, feature  -- カラム名
+FROM one_piece;       -- テーブル名
+
+
+| name   | feature |
+| ルフィ  |   自由   |
+|  ゾロ   | 方向音痴  |
+|ブルック| |    骨    |
+| サンジ |   ぐる眉  |
+
+SQLを理解するコツ
+元々どういう表があって、そこから新たにどういう表のデータを取ってきたいか、どういう表を作りたいかを考える（例：SELECT 列1, 列3）
+
+カラム名の変更
+  SELECT name AS '名前', feature AS '特徴'
+FROM one_piece;
+
+  AS:カラム名を変更
+
+|  名前   |   特徴   |
+| ルフィ  |   自由   |
+|  ゾロ   | 方向音痴  |
+|ブルック| |    骨    |
+| サンジ |   ぐる眉  |
+
+  SELECT *
+    FROM one piece;
+  *:全カラムを指定
+
+| name  |  fruit  | feature |
+| ルフィ | ヒトヒト |   自由   |
+|  ゾロ  |  無し   | 方向音痴  |
+|ブルック| ヨミヨミ |    骨    |
+| サンジ |  無し   |   ぐる眉  |
+
+Q//悪魔の実の一覧を取得(重複なし)
+
+SELECT fruit
+  FROM one piece;だと重複してしまう
+
+|  fruit  |
+| ヒトヒト |
+|  無し   |
+| ヨミヨミ |
+|  無し   |
+
+SELECT DISTINCT(fruit)
+ FROM one piece;
+  DISTINCT:重複削除
+
+|  fruit  |
+| ヒトヒト |
+|  無し   |
+| ヨミヨミ |
+
+Q//可愛いが5より大きいキャラの名前と可愛いを取得
+
+Pokémon
+|  name  | kawaii | role |
+|  プリン |   4    | 弱い |
+| サイドン |   1   |  |
+|ピカチュウ|   6    | 弱い |
+|  ミュウ |   10   | 万能 |
+
+SELECT name, kawaii
+  FROM Pokémon
+WHERE kawaii > 5;
+  WHERE:条件指定
+
+|  name  | kawaii |
+|ピカチュウ|   6    |
+|  ミュウ |   10   |
+WHEREは条件に合ったレコードを取るイメージ
+
+Q//可愛いが5より大きいroleが弱いレコードを取得
+
+SELECT *
+  FROM Pokémon
+WHERE kawaii > 5 AND role = '弱い';
+  AND:両方満たす
+
+|  name  | kawaii | role |
+|ピカチュウ|   6    | 弱い |
+
+Q// 可愛いが5より大きいかroleが弱いのレコードを取得
+
+SELECT *
+  FROM Pokémon
+WHERE kawaii > 5 OR role = '弱い';
+  OR:どちらか満たす
+
+Q///可愛いが4〜6のキャラのレコードを取得
+
+SELECT *
+  FROM Pokémon
+WHERE kawaii BETWEEN 4 AND 6;
+  BETWEEN:~の間
+
+|  name  | kawaii | role |
+|  プリン |   4    | 弱い |
+|ピカチュウ|   6    | 弱い |
+
+Q//役割が弱いか万能のレコードを取得
+
+SELECT *
+  FROM Pokémon
+WHERE kawaii IN ('弱い','万能');
+  IN:まとめて指定
+  NOT IN:まとめて否定
+
+|  name  | kawaii | role |
+|  プリン |   4    | 弱い |
+|ピカチュウ|   6    | 弱い |
+|  ミュウ |   10   | 万能 |
+
+Q//名前が「ミ」から始まるレコードを取得
+
+SELECT *
+  FROM Pokémon
+WHERE name LIKE 'ミ%';
+  LIKE:あいまい検索
+
+|  name  | kawaii | role |
+|  ミュウ |   10   | 万能 |
+
+Q//roleが空のレコードを取得
+
+SELECT *
+  FROM Pokémon
+WHERE role IS NULL;
+  NULL:値が不明
+  IS NULL:NULL指定
+  IS NOT NULL:NULLじゃない
+
+|  name  | kawaii | role |
+| サイドン |   1   |  |
+
+Q//Pokémonテーブルのうち、レコードを2行だけ取得
+
+SELECT *
+  FROM Pokémon
+  LIMIT 2;LIMIT:行数上限指定
+  SQLを書く際、データが多すぎると実行が遅くなったりフリーズしたりする
+
+|  name  | kawaii | role |
+|  プリン |   4    | 弱い |
+| サイドン |   1   |  |
+
+Q//可愛いの昇順で並び替え
+
+SELECT *
+  FROM Pokémon
+ORDER BY kawaii;
+  ORDER BY:並び替え
+
+|  name  | kawaii | role |
+| サイドン |   1   |  |
+|  プリン |   4    | 弱い |
+|ピカチュウ|   6    | 弱い |
+|  ミュウ |   10   | 万能 |
+
+SELECT *
+  FROM Pokémon
+ORDER BY kawaii DESC;
+  DESC:降順
+
+|  name  | kawaii | role |
+|  ミュウ |   10   | 万能 |
+|ピカチュウ|   6    | 弱い |
+|  プリン |   4    | 弱い |
+| サイドン |   1   |  |
+
+・SQLを書く上での秘訣
+  予約語(SELECT,WHERE,etc)は大文字
+  特定の予約語(SELECT,WHERE,ORDER BY,etc)の後は改行しよう
+  SELECTで列名指定,LIMITすると速くなる
