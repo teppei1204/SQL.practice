@@ -284,3 +284,4 @@ SELECT created_day, channel, COUNT(name)
 軸になるカラムを全てGROUP BYで指定。
 なんの値が入るかをSQLが特定できるようにする
 
+・集計関数
