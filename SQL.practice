@@ -401,3 +401,74 @@ LEFT OUTER JOIN   外部結合
 |  ハーマイオニー  |   null   |
 |       ロン     |    地球   |
 
+
+## CASE式 (〇〇なら××の処理を行う)
+
+```sql
+SELECT CASE WHEN 条件 THEN 値
+            WHEN 条件 THEN 値
+            ELSE 値 END
+FROM テーブル名;
+
+
+SQLで条件分岐を実現するのがCASE式
+複雑な条件のSQLもスッキリ書けるようになる
+
+Q「関西などのエリアごとの人口出して」
+
+populations
+| pref_name  | population |
+|    京都    |    300     |
+|    大阪    |    900     |
+|    福岡    |    500     |
+|    佐賀    |    100     |
+
+手順
+①
+populations
+| pref_name  | population |
+|    京都    |    300     |
+|    大阪    |    900     |
+|    福岡    |    500     |
+|    佐賀    |    100     |
+
+②
+SELECT
+  CASE WHEN pref_name IN ('京都','大阪') THEN '関西'
+  WHEN pref_name IN ('福岡','佐賀') THEN '九州'
+  ELSE NULL
+  END AS district,
+  population
+FROM
+  populations;
+
+| district | population |
+|    関西   |    300     |
+|    関西   |    900     |
+|    九州   |    500     |
+|    九州   |    100     |
+
+③
+SELECT
+  CASE WHEN pref_name IN ('京都','大阪') THEN '関西'
+  WHEN pref_name IN ('福岡','佐賀') THEN '九州'
+  ELSE NULL
+  END AS district,
+  SUM(population) AS population  -- population の合計を求める
+FROM
+  populations
+GROUP BY
+  CASE WHEN pref_name IN ('京都','大阪') THEN '関西'
+  WHEN pref_name IN ('福岡','佐賀') THEN '九州'
+  ELSE NULL
+  END;
+
+| district | population |
+|    関西   |    1200    |
+|    九州   |    600     |
+
+・CASE式の使い所
+  単体で使っても条件分岐できて便利
+  分析用の分類単位で集計したいときに、集約関数(SAM)とGROUP BY句と一緒に使うことで大活躍
+  条件に応じて集計したい時はCASE式
+  SQL初心者から中級者へ
