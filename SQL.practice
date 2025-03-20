@@ -316,3 +316,88 @@ GROUP BY created_day;
 |  2025-03-17  |  31 |31|
 |  2025-03-18  |  33 |33|
 
+
+## テーブル結合(INNER/OUTER JOIN)
+
+- 複数テーブルのデータを一度に取得するには？
+- JOINはSQLにおいて必須
+
+### 宇宙人「火星人の渡航歴を10分以内に出せ。じゃないとクビだ」
+
+**martians**
+| id|     name     |
+| 1 |     ハリー    |
+| 2 |  ハーマイオニー |
+| 3 |      ロン     |
+| 4 |   ダンブルドア  |
+| 5 |  ヴォルデモート  |
+
+**histories**
+| id | martians_id | planet |
+| 1 |       3      |  地球  |
+| 2 |       1      |  木星  |
+| 3 |       4      |  土星  |
+| 4 |       5      |  海王星 |
+
+JOIN
+
+| id|     name     | id| martians_id | planet |
+| 1 |     ハリー    | 2|       1      |  木星  |
+| 2 |      ロン     | 1|       3      |  地球  |
+| 3 |   ダンブルドア | 3|       4      |  土星  |
+| 4 | ヴォルデモート | 4|       5      | 海王星  |
+
+SELECT *
+  FROM martians AS m
+INNER JOIN histories AS h ON m.id = h.martians_id;
+
+histories → 結合したいテーブル
+m.id = h.martians_id → 結合条件
+
+### 宇宙人「渡航したやつの名前と渡航先だけだせ」
+
+SELECT m.name, h.planet
+  FROM martians AS m
+INNER JOIN histories AS h ON m.id = h.martians_id;
+
+|     m.name     | h.planet |
+|      ハリー     |   木星    |
+|       ロン     |    地球   |
+|   ダンブルドア   |    土星   |
+|  ヴォルデモート  |   海王星   |
+
+宇宙人「惑星渡航歴のないやつの名前が消えているぞ」
+
+※条件にマッチするレコードがないものは削除される※
+(ハーマイオニーが削除されている)
+
+SELECT m.name, h.planet
+  FROM martians AS m
+  LEFT OUTER JOIN histories AS h
+    ON m.id = h.martians_id;
+
+|     m.name     | h.planet |
+|      ハリー     |   木星    |
+|  ハーマイオニー  |   null   |
+|       ロン     |    地球   |
+|   ダンブルドア   |    土星   |
+|  ヴォルデモート  |   海王星   |
+
+INNER JOIN   内部結合
+  ベン図でいうところの合わさった部分のデータを取れる
+  条件にマッチしたデータだけ欲しい時
+  こっちの方が多様
+
+|     m.name     | h.planet |
+|      ハリー     |   木星    |
+|       ロン     |    地球   |
+
+LEFT OUTER JOIN   外部結合
+  ベースとなるテーブルの全データと結合したデータのうちの条件にマッチしたデータが取れる
+  条件に合わないデータも欲しい時
+
+|     m.name     | h.planet |
+|      ハリー     |   木星    |
+|  ハーマイオニー  |   null   |
+|       ロン     |    地球   |
+
