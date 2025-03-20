@@ -284,4 +284,35 @@ SELECT created_day, channel, COUNT(name)
 軸になるカラムを全てGROUP BYで指定。
 なんの値が入るかをSQLが特定できるようにする
 
-・集計関数
+## 集計関数
+
+- **値を集計する**
+  - `COUNT`: レコード数
+  - `AVG`: 平均
+  - `MAX`: 最大値
+  - `MIN`: 最小値
+  - `SUM`: 合計
+
+### 鬼「遅い。日毎の会員登録者の平均年齢と最大年齢を出せ」
+
+**members**
+
+| name     | created_day | channel | age |
+|----------|-------------|---------|-----|
+| 蕪木太郎 | 2025-03-15  | web     | 31  |
+| 蕪木二郎 | 2025-03-15  | ad      | 31  |
+| 蕪木三郎 | 2025-03-17  | ad      | 31  |
+| 蕪木四郎 | 2025-03-17  | ad      | 32  |
+| 蕪木五郎 | 2025-03-18  | web     | 33  |
+
+```sql
+SELECT created_day, AVG(age), MAX(age)
+FROM members
+GROUP BY created_day;
+
+
+| created_day | avg |Max|
+|  2025-03-15  |  31 |31|
+|  2025-03-17  |  31 |31|
+|  2025-03-18  |  33 |33|
+
