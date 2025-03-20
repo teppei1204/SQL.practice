@@ -472,3 +472,88 @@ GROUP BY
   分析用の分類単位で集計したいときに、集約関数(SAM)とGROUP BY句と一緒に使うことで大活躍
   条件に応じて集計したい時はCASE式
   SQL初心者から中級者へ
+
+
+・## サブクエリ (クエリの中のクエリ)
+
+サブクエリとは、クエリの中に別のクエリを含めることです。  
+クエリをネストすることで、より複雑な条件や集計を実行できます。
+
+### Q. 平均価格以上の商品を出す
+
+#### items テーブル
+
+| name       | category | price  |
+|------------|----------|--------|
+| iPhone16   | スマホ   | 100,000|
+| pixel 5    | スマホ   | 80,000 |
+| Xperia6    | スマホ   | 90,000 |
+| ルンバ980  | 掃除機   | 50,000 |
+| DysonV11   | 掃除機   | 40,000 |
+| バルミューダC| 掃除機 | 60,000 |
+
+#### 手順
+
+1. **全商品の平均価格を取得**
+
+```sql
+SELECT AVG(price)
+  FROM items;
+
+//70,000
+
+SELECT *
+  FROM items
+WHERE price >= 70000;
+
+|   name   | category | price |
+| iPhone16 |  スマホ   | 100,000|
+|  pixel 5 |  スマホ   | 80,000|
+|  Xperia6 |  スマホ   | 90,000|
+
+上記の書き方も良いが...
+⬇️この書き方がいい⬇️
+SELECT *
+  FROM items
+WHERE piece >= (SELECT AVG(piece)
+                  FROM items);
+⬆️この書き方が良い⬆️
+
+(SELECT AVG(piece)
+    FROM items);
+    ⬇️クエリ内のクエリ = サブクエリ
+  70000;
+
+Q「カテゴリーごとに平均価格以上の商品を出して」
+
+SELECT *
+  FROM items
+WHERE piece >= (SELECT AVG(piece)
+                  FROM items
+                GROUP BY category);
+この書き方だと90000,50000の2行の結果が返ってくるのでエラーになる
+
+SELECT *
+  FROM items AS i1
+WHERE piece >= (SELECT AVG(piece)
+                  FROM items AS i2
+                WHERE i1.category = i2.category//相関サブクエリ
+                GROUP BY category);
+考え方
+SELECT * FROM items WHERE 100000 >= 90000;○
+SELECT * FROM items WHERE 80000 >= 90000;
+SELECT * FROM items WHERE 90000 >= 90000;○
+SELECT * FROM items WHERE 50000 >= 50000;○
+SELECT * FROM items WHERE 40000 >= 50000;
+SELECT * FROM items WHERE 60000 >= 50000;○
+
+|   name   | category | price |
+| iPhone16 |  スマホ   | 100,000|
+|  Xperia6 |  スマホ   | 90,000|
+| ルンバ980 |  掃除機   | 50,000|
+|バルミューダC| 掃除機   | 60,000|
+
+・サブクエリを使う上での注意
+  重いし複雑   使わなくて済むなら使わなくてOK
+  二段階以上の集計を行う場合   使わざるを得ない
+  実際に実行されているSQL文を書いてみるとイメージ湧いて使いこなせる
